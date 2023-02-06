@@ -59,7 +59,42 @@ let newEmployee = [ {
 {
   type: 'input',
   message: "What is the Employee manager id?",
+  default:'1-3',
   name: 'manager_id',
+  validate: function (answer) {
+      if (answer == null || answer == 0) {
+          return console.log("Invalid");
+      }
+      return true;
+  }
+}]
+
+let newRole = [{
+  type: 'input',
+  message: "What is the role Title?",
+  name: 'title',
+  validate: function (answer) {
+      if (answer.length < 1) {
+          return console.log("Invalid");
+      }
+      return true;
+  }
+},
+{
+  type: 'input',
+  message: "What is the role Salary?",
+  name: 'salary',
+  validate: function (answer) {
+      if (answer.length < 1) {
+          return console.log("Invalid");
+      }
+      return true;
+  }
+},
+{
+  type: 'input',
+  message: "What is the role department_id?",
+  name: 'department_id',
   validate: function (answer) {
       if (answer == null || answer == 0) {
           return console.log("Invalid");
@@ -135,9 +170,11 @@ async function addEmployee(){
   db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${employee.first_name}', '${employee.last_name}', '${employee.role_id}', '${employee.manager_id}');`,
   function(err, res) {
     if (err) {
-      console.log(err);
+      console.log('\nInvalid, check constraints\n');
+      db.query(`DELETE FROM employee WHERE (first_name, last_name, role_id, manager_id) = ('${employee.first_name}', '${employee.last_name}', '${employee.role_id}', '${employee.manager_id}');`);
+      addEmployee();
     } else {
-      console.log(`Employee Added!`);
+      console.log(`\nEmployee Added!\n`);
       init();
     }
   });
@@ -156,7 +193,19 @@ function viewAllRoles(){
   });
 }
 
-function addRole(){
+async function addRole(){
+  const role = await inquirer.prompt(newRole);
+  db.query(`INSERT INTO role (title, salary, department_id) VALUES ('${role.title}', '${role.salary}', '${role.department_id}');`,
+  function(err, res) {
+    if (err) {
+      console.log('\nInvalid, check constraints\n');
+      db.query(`DELETE FROM role WHERE (title, salary, department_id) = ('${role.title}', '${role.salary}', '${role.department_id}');`);
+      addRole();
+    } else {
+      console.log(`\nRole Added!\n`);
+      init();
+    }
+  });
 
 }
 
@@ -174,8 +223,32 @@ function viewAllDepartments(){
 
 }
 
-function addDepartment(){
+async function addDepartment(){
+  const question = {  
+    type: 'input',
+    message: "What is the name of the Department?",
+    name: 'department',
+    validate: function (answer) {
+        if (answer == null || answer < 1) {
+            return console.log("Invalid");
+        }
+        return true;
+    }
+  }
 
+  const dept = await inquirer.prompt(question);
+  db.query(`INSERT INTO department (id, name) VALUES (NULL, '${dept.department}');`),
+  function(err, res) {
+    if (err) {
+      console.log('\nInvalid, check constraints\n');
+      db.query(`DELETE FROM department WHERE (name) = ('${dept.department}');`);
+      addDepartment();
+    } 
+  };
+  
+  console.log(`\nDepartment Added!\n`);
+
+  init();
 }
 
 function updateEmployee(){
