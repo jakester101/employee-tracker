@@ -1,8 +1,9 @@
 const inquirer = require("inquirer")
 const mysql = require('mysql2');
-const tableGen = require('console.table');
+const cTable = require('console.table');
 const express = require('express');
 const { inherits } = require("util");
+const { table } = require("console");
 
 //homescreen with options. each choice will lead to it's function
 let homescreen = [
@@ -76,10 +77,16 @@ let choice = await inquirer.prompt(homescreen);
 }
 
 
-
 function viewAllEmployees(){
-  console.log('hey mom');
-  init();
+  db.query(`SELECT employee.first_name AS First_Name,employee.last_name AS Last_Name,role.title AS Title,role.salary AS Salary,department.name AS Department, CONCAT(pikachu.first_name, ' ' ,pikachu.last_name) AS Manager FROM employee INNER JOIN role ON role.id = employee.role_id INNER JOIN department ON department.id = role.department_id LEFT JOIN employee pikachu ON employee.manager_id = pikachu.id;`,
+  function(err, res) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.table(res);
+      init();
+    }
+  });
 }
 
 function addEmployee(){
@@ -103,7 +110,7 @@ function addDepartment(){
 }
 
 function updateEmployee(){
-  
+
 }
 
 
