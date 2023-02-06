@@ -59,7 +59,6 @@ VALUES ("Rocky", "Balboa", 6, 3);
 
 
 
-
 -- populate all --
 SELECT * FROM employee;
 -- populate all --

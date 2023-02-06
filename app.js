@@ -23,12 +23,53 @@ let homescreen = [
   }
 ]
 
-// const PORT = process.env.PORT || 3001;
-// const app = express();
+let newEmployee = [ {
+  type: 'input',
+  message: "What is the Employee first name?",
+  name: 'first_name',
+  validate: function (answer) {
+      if (answer.length < 1) {
+          return console.log("Invalid");
+      }
+      return true;
+  }
+},
+{
+  type: 'input',
+  message: "What is the Employee last name?",
+  name: 'last_name',
+  validate: function (answer) {
+      if (answer.length < 1) {
+          return console.log("Invalid");
+      }
+      return true;
+  }
+},
+{
+  type: 'input',
+  message: "What is the Employee role_id?",
+  name: 'role_id',
+  validate: function (answer) {
+      if (answer == null || answer == 0) {
+          return console.log("Invalid");
+      }
+      return true;
+  }
+},
+{
+  type: 'input',
+  message: "What is the Employee manager id?",
+  name: 'manager_id',
+  validate: function (answer) {
+      if (answer == null || answer == 0) {
+          return console.log("Invalid");
+      }
+      return true;
+  }
+}]
 
-// // Express middleware
-// app.use(express.urlencoded({ extended: false }));
-// app.use(express.json());
+
+
 
 // Connect to database
 const db = mysql.createConnection(
@@ -89,8 +130,17 @@ function viewAllEmployees(){
   });
 }
 
-function addEmployee(){
-
+async function addEmployee(){
+  const employee = await inquirer.prompt(newEmployee);
+  db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${employee.first_name}', '${employee.last_name}', '${employee.role_id}', '${employee.manager_id}');`,
+  function(err, res) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(`Employee Added!`);
+      init();
+    }
+  });
 }
 
 function viewAllRoles(){
