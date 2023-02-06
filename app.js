@@ -94,7 +94,16 @@ function addEmployee(){
 }
 
 function viewAllRoles(){
+  db.query(`SELECT * FROM role;`,
+  function(err, res) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.table(res);
+      init();
+    }
 
+  });
 }
 
 function addRole(){
@@ -102,6 +111,16 @@ function addRole(){
 }
 
 function viewAllDepartments(){
+  db.query(`SELECT * FROM department;`,
+  function(err, res) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.table(res);
+      init();
+    }
+
+  });
 
 }
 
