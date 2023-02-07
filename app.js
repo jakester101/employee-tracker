@@ -4,6 +4,7 @@ const cTable = require('console.table');
 const express = require('express');
 const { inherits } = require("util");
 const { table } = require("console");
+const { rawListeners, listenerCount } = require("process");
 
 //homescreen with options. each choice will lead to it's function
 let homescreen = [
@@ -18,7 +19,7 @@ let homescreen = [
             "Add Role",
             "View All Departments",
             "Add Department",
-            "Update Employee",
+            "Update Employee Role",
           ]
   }
 ]
@@ -146,7 +147,7 @@ let choice = await inquirer.prompt(homescreen);
   if (choice.choice === 'Add Department'){
     addDepartment();
   }
-  if (choice.choice === 'Update Employee'){
+  if (choice.choice === 'Update Employee Role'){
     updateEmployee();
   }
 
@@ -245,14 +246,64 @@ async function addDepartment(){
       addDepartment();
     } 
   };
-  
+
   console.log(`\nDepartment Added!\n`);
 
   init();
 }
 
-function updateEmployee(){
+ async function updateEmployee(){
+  db.query(`SELECT * FROM employee;`,
+  function(err, res) {
+    if (err) {
+      console.log(err);
+    } else {
+      //use map method to filter thru employees
+      const extractedData = res.map(employee => {
+        return {
+          name: `${employee.first_name} ${employee.last_name}`,
+          role_id: employee.role_id
+        };
+      });
 
+      console.log(extractedData);
+      inquirer.prompt([
+        {
+        type: 'list',
+        name: 'employee',
+        choices:function() {
+          var Name = [];
+          for (var i = 0; i < extractedData.length; i++) {
+            Name.push(extractedData[i].name);
+          }
+          return Name;
+        },
+        message: 'What is the Employee name?'
+        },
+        {
+        type: 'input',
+        name: 'role',
+        message: 'What is the new role id?'
+        }])
+        .then(val => {
+        const fullName = val.employee;
+        const nameArray = fullName.split(" ");
+        const firstName = nameArray[0];
+        const lastName = nameArray[1];
+        const newID = val.role;
+        
+        db.query(`UPDATE employee SET role_id = ${newID} WHERE first_name = '${firstName}' AND last_name = '${lastName}';`,
+        function(err, res) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.table(`\nRole Updated!\n`);
+            init();
+          }
+        });
+      });
+    }
+  });
 }
 
 
@@ -262,21 +313,4 @@ function updateEmployee(){
 
 
 
-// Query database example
-
-// db.query(`DELETE FROM favorite_books WHERE id = ?`, 3, (err, result) => {
-//   if (err) {
-//     console.log(err);
-//   }
-//   console.log(result);
-// });
-
-
-// app.use((req, res) => {
-//   res.status(404).end();
-// });
-
-// app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
 
