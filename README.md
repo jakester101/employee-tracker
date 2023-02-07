@@ -12,6 +12,9 @@
   
   Install npm packages with 'npm i'. Open mySQL in /db and run 'source schema.sql' to load the database, then run 'seeds.sql' to populate the premade employees. Exit out and run node app.js to launch the command line application.
   
+  ## Demonstration
+  https://drive.google.com/file/d/1DCuZprTQfZ08ZGHUxb0wG0HMJG_2bObZ/view
+  
   ## License
   
   MIT License
